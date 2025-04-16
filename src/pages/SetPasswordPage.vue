@@ -38,7 +38,7 @@
     </q-card>
   </q-page>
 </template>
-  
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
@@ -70,4 +70,3 @@ async function onSubmit() {
   })
 }
 </script>
-  

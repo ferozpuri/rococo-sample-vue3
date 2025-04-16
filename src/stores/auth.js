@@ -1,10 +1,9 @@
 import { defineStore, acceptHMRUpdate } from 'pinia'
-import { Notify } from 'quasar';
-import axios from "config/axios"
-import localStorageService from 'services/localStorage.service';
+import { Notify } from 'quasar'
+import axios from 'config/axios'
+import localStorageService from 'services/localStorage.service'
 
-import { handleAuthRequest } from '@/utils/apiHelper';
-
+import { handleAuthRequest } from '@/utils/apiHelper'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -17,11 +16,11 @@ export const useAuthStore = defineStore('auth', {
     // Computed property for isAuthenticated
     isAuthenticated: (state) => {
       if (!state.accessToken || !state.accessTokenExpiry) {
-        return false; // No token or expiry date
+        return false // No token or expiry date
       }
 
-      const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds (UNIX timestamp)
-      return currentTime < state.accessTokenExpiry; // Check if token is still valid
+      const currentTime = Math.floor(Date.now() / 1000) // Current time in seconds (UNIX timestamp)
+      return currentTime < state.accessTokenExpiry // Check if token is still valid
     },
   },
 
@@ -29,45 +28,65 @@ export const useAuthStore = defineStore('auth', {
     async signup(payload) {
       let response
       try {
-        response = await axios.post('/auth/signup', payload);        
+        response = await axios.post('/auth/signup', payload)
       } catch {
         Notify.create({
-          message: "An unknown error occurred",
-          color: "danger"
+          message: 'An unknown error occurred',
+          color: 'danger',
         })
-        return false;
+        return false
       }
 
       if (response.data?.success) {
-        return true;
+        return true
       } else {
         Notify.create({
           message: response.data?.message,
-          color: "danger"
+          color: 'danger',
         })
       }
     },
 
     async login(payload) {
-      return handleAuthRequest(this, () =>
-        axios.post('/auth/login', payload), this.router
-      );
+      return handleAuthRequest(this, () => axios.post('/auth/login', payload), this.router)
+    },
+
+    async forgotPassword(email) {
+      try {
+        const response = await axios.post('/auth/forgot_password', { email })
+        if (response.data?.success) {
+          Notify.create({
+            message: 'Password reset link has been sent to your email',
+            color: 'positive',
+          })
+          return true
+        }
+      } catch (error) {
+        Notify.create({
+          message:
+            error.response?.data?.message || 'An error occurred while processing your request',
+          color: 'danger',
+        })
+        return false
+      }
     },
 
     async setPassword(token, uidb64, payload) {
-      return handleAuthRequest(this, () =>
-        axios.post(`/auth/reset_password/${token}/${uidb64}`, payload), this.router
-      );
+      return handleAuthRequest(
+        this,
+        () => axios.post(`/auth/reset_password/${token}/${uidb64}`, payload),
+        this.router,
+      )
     },
 
     async logout() {
       localStorageService.clear()
-      this.user = null;
-      this.accessToken = null;
-      this.accessTokenExpiry = null;
+      this.user = null
+      this.accessToken = null
+      this.accessTokenExpiry = null
       this.router.push('/login')
     },
-  }
+  },
 })
 
 if (import.meta.hot) {
