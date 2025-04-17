@@ -10,6 +10,11 @@ const routes = [
         meta: { requiresAuth: true },
       },
       {
+        path: 'todos',
+        component: () => import('pages/TodoPage.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: 'login',
         component: () => import('pages/LoginPage.vue'),
         meta: { requiresAuth: false },
