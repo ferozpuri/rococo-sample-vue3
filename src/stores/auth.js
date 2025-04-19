@@ -10,21 +10,19 @@ export const useAuthStore = defineStore('auth', {
     user: localStorageService.getItem('user') || null, // Initialize from localStorage
     accessToken: localStorageService.getItem('accessToken') || null, // Initialize from localStorage
     accessTokenExpiry: localStorageService.getItem('accessTokenExpiry') || null, // Initialize from localStorage
+    loading: false,
+    error: null,
   }),
 
   getters: {
-    // Computed property for isAuthenticated
-    isAuthenticated: (state) => {
-      if (!state.accessToken || !state.accessTokenExpiry) {
-        return false // No token or expiry date
-      }
-
-      const currentTime = Math.floor(Date.now() / 1000) // Current time in seconds (UNIX timestamp)
-      return currentTime < state.accessTokenExpiry // Check if token is still valid
-    },
+    isAuthenticated: (state) => !!state.user,
   },
 
   actions: {
+    async fetchUser() {
+      return handleAuthRequest(this, () => axios.get('/person/me'))
+    },
+
     async signup(payload) {
       let response
       try {
