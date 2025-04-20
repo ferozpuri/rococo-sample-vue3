@@ -7,7 +7,6 @@ export default {
   },
   getItem(key) {
     try {
-      console.log('getItem => ', key, localStorage.getItem(key))
       return JSON.parse(localStorage.getItem(key))
     } catch (error) {
       console.error('Error parsing localStorage item:', error)

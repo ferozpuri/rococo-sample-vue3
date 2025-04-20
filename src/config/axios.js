@@ -15,7 +15,6 @@ const apiClient = axios.create({
 // Add a request interceptor to include the auth token
 apiClient.interceptors.request.use((config) => {
   const authStore = useAuthStore()
-  console.log('authStore =>', authStore.isAuthenticated, authStore.accessToken)
   if (authStore.isAuthenticated) {
     config.headers.Authorization = `Bearer ${authStore.accessToken}`
   }
